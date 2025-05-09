@@ -37,14 +37,14 @@
 }
 
 /* スマホ対応 */
-@media screen and (max-width: 768px) {
+/*@media screen and (max-width: 768px) {
     #character {
         width: 300px;
         height: auto;
         max-width: 80vw;
         max-height: 60vh;
     }
-}
+} */
 
 /* テキストボックスのスタイル */
 #text-box {
