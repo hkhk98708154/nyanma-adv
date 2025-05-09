@@ -1,0 +1,133 @@
+/* ゲームコンテナのスタイル */
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 0;
+}
+
+/* 背景画像のスタイル */
+#background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+}
+
+/* キャラクター画像のスタイル */
+#character {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 1200px;
+    max-width: 80vw;
+    max-height: 80vh;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: bottom center;
+    z-index: 2;
+}
+
+/* スマホ対応 */
+@media screen and (max-width: 768px) {
+    #character {
+        width: 300px;
+        height: auto;
+        max-width: 80vw;
+        max-height: 60vh;
+    }
+}
+
+/* テキストボックスのスタイル */
+#text-box {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    padding: 20px 25px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    border-radius: 20px;
+    font-family: sans-serif;
+    z-index: 3;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+/* キャラクター名のスタイル */
+#character-name {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #ff7777;
+    font-size: 20px;
+}
+
+/* テキスト内容のスタイル */
+#dialogue {
+    line-height: 1.6;
+}
+
+/* 選択肢コンテナのスタイル */
+#choice-container {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 4;
+}
+
+/* 選択肢ボタンのスタイル */
+.choice-button {
+    padding: 15px;
+    background-color: rgba(255, 150, 150, 0.6); /* 薄い赤、強めの透過 */
+    color: #fff;
+    border: 1px solid rgba(255, 150, 150, 0.8);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    font-family: sans-serif;
+    backdrop-filter: blur(5px);
+    transition: background-color 0.3s, border 0.3s;
+}
+
+/* ホバー時のスタイル */
+.choice-button:hover {
+    background-color: rgba(255, 150, 150, 0.8);
+    border-color: rgba(255, 150, 150, 1);
+}
+
+/* ボタンの文字が読みやすいように少し大きめに */
+.choice-button {
+    font-size: 18px;
+}
+
+/* スマホ対応 */
+@media screen and (max-width: 768px) {
+    .choice-button {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    #text-box {
+        padding: 15px 20px;
+    }
+
+    #character-name {
+        font-size: 18px;
+        padding: 8px 12px;
+    }
+}
