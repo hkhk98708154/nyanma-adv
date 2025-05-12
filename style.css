@@ -131,3 +131,80 @@
         padding: 8px 12px;
     }
 }
+
+/* BGMボタンのスタイル */
+#bgm-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 150, 150, 0.8);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 5;
+    transition: background-color 0.3s;
+}
+
+#bgm-button:hover {
+    background-color: rgba(255, 150, 150, 1);
+}
+
+/* BGMボタンのスタイル */
+#bgm-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 150, 150, 0.8);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 10;
+    transition: background-color 0.3s;
+}
+
+/* BGMボタンホバー */
+#bgm-button:hover {
+    background-color: rgba(255, 150, 150, 1);
+}
+
+/* 音量スライダーのスタイル */
+#volume-slider {
+    position: absolute;
+    top: 90px;  /* ボタンの下に配置 */
+    right: 30px;
+    width: 150px;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.6);
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* スライダーのつまみ */
+#volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(255, 150, 150, 0.8);
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* つまみホバー */
+#volume-slider::-webkit-slider-thumb:hover {
+    background-color: rgba(255, 150, 150, 1);
+}
+

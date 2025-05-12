@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>にゃんまちゃんADV風説明</title>
+    <title>にゃんまちゃん説明ADV</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,6 +15,14 @@
             <div id="dialogue"></div>
         </div>
         <div id="choice-container"></div>
+        <!-- BGM ボタン -->
+        <button id="bgm-button" onclick="toggleBGM()">🔊</button>
+        <!-- 音量調整スライダー -->
+        <input type="range" id="volume-slider" min="0" max="100" value="50" onchange="adjustVolume(this.value)">
+        <!-- BGM プレイヤー（非表示） -->
+        <audio id="bgm" loop>
+            <source src="assets/bgm.mp3" type="audio/mpeg">
+        </audio>
     </div>
 
     <!-- 先にシナリオデータを読み込む -->
