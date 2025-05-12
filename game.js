@@ -12,8 +12,10 @@ let isSelecting = false;
 let isTyping = false;
 let currentText = "";
 let charIndex = 0;
-let typingSpeed = 30; // 文字送り速度（ミリ秒）
+let typingSpeed = 120; // 文字送り速度（ミリ秒）
 let skipIndex = -1;
+let mouthAnimationInterval = null;
+let mouthOpen = false;
 
 // テキストを1文字ずつ表示する関数
 function typeText(text) {
@@ -21,17 +23,60 @@ function typeText(text) {
     currentText = text;
     charIndex = 0;
     dialogue.textContent = ""; // 初期化
+    startMouthAnimation(); // 口パク開始
     typeNextCharacter();
 }
 
 // 次の文字を表示する関数
 function typeNextCharacter() {
+    // 強制表示が実施された場合は終了
+    if (!isTyping) return;
+
+    // 文字送り処理
     if (charIndex < currentText.length) {
         dialogue.textContent += currentText[charIndex];
         charIndex++;
         setTimeout(typeNextCharacter, typingSpeed);
     } else {
         isTyping = false;
+        stopMouthAnimation(); // 口パク停止
+    }
+}
+
+// 強制的に全文表示する関数
+function forceCompleteText() {
+    dialogue.textContent = currentText;
+    isTyping = false;
+    stopMouthAnimation();
+}
+
+// 口パクアニメーションの開始
+function startMouthAnimation() {
+    if (mouthAnimationInterval) return; // 既に開始されている場合は無視
+
+    const currentImage = character.style.backgroundImage;
+    if (currentImage.includes("_closed")) {
+        mouthAnimationInterval = setInterval(() => {
+            if (mouthOpen) {
+                character.style.backgroundImage = currentImage.replace("_open", "_closed");
+                mouthOpen = false;
+            } else {
+                character.style.backgroundImage = currentImage.replace("_closed", "_open");
+                mouthOpen = true;
+            }
+        }, 150); // 口パクの速さ
+    }
+}
+
+// 口パクアニメーションの停止
+function stopMouthAnimation() {
+    clearInterval(mouthAnimationInterval);
+    mouthAnimationInterval = null;
+    
+    // 口を閉じた状態に戻す
+    const currentImage = character.style.backgroundImage;
+    if (currentImage.includes("_open")) {
+        character.style.backgroundImage = currentImage.replace("_open", "_closed");
     }
 }
 
@@ -112,11 +157,13 @@ function loadNextLine() {
                     if (fullText.includes("「")) {
                         const [selectName, selectText] = fullText.split("「");
                         characterName.textContent = selectName.trim();
-                        typeText(selectText.replace("」", "").trim());
+                        currentText = selectText.replace("」", "").trim();
+                        typeText(currentText);
                     } else {
                         // キャラ名なしのセリフ（直接表示）
                         characterName.textContent = "";
-                        typeText(fullText.trim());
+                        currentText = fullText.trim();
+                        typeText(currentText);
                     }
 
                     // 次の通常セリフに進む位置に設定
@@ -145,11 +192,13 @@ function loadNextLine() {
         const [name, text] = line.split("「");
         if (text) {
             characterName.textContent = name.trim();
-            typeText(text.replace("」", "").trim());
+            currentText = text.replace("」", "").trim();
+            typeText(currentText);
         } else {
             // キャラ名なしのセリフ
             characterName.textContent = "";
-            typeText(line.trim());
+            currentText = line.trim();
+            typeText(currentText);
         }
     }
 
@@ -161,12 +210,10 @@ loadNextLine();
 
 // クリックで次のセリフへ
 textBox.addEventListener("click", () => {
-    if (!isTyping && !isSelecting) {
+    if (isTyping) {
+        forceCompleteText();
+    } else if (!isSelecting) {
         loadNextLine();
-    } else if (isTyping) {
-        // 文字送り中にクリックされたら強制表示
-        dialogue.textContent = currentText;
-        isTyping = false;
     }
 });
 
