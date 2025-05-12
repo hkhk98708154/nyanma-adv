@@ -12,34 +12,33 @@ let isSelecting = false;
 let isTyping = false;
 let currentText = "";
 let charIndex = 0;
-let typingSpeed = 120; // 文字送り速度（ミリ秒）
+let typingSpeed = 120;
 let skipIndex = -1;
 let mouthAnimationInterval = null;
 let mouthOpen = false;
+let currentCharacterImage = "";
 
 // テキストを1文字ずつ表示する関数
 function typeText(text) {
     isTyping = true;
     currentText = text;
     charIndex = 0;
-    dialogue.textContent = ""; // 初期化
-    startMouthAnimation(); // 口パク開始
+    dialogue.textContent = "";
+    startMouthAnimation();
     typeNextCharacter();
 }
 
 // 次の文字を表示する関数
 function typeNextCharacter() {
-    // 強制表示が実施された場合は終了
     if (!isTyping) return;
 
-    // 文字送り処理
     if (charIndex < currentText.length) {
         dialogue.textContent += currentText[charIndex];
         charIndex++;
         setTimeout(typeNextCharacter, typingSpeed);
     } else {
         isTyping = false;
-        stopMouthAnimation(); // 口パク停止
+        stopMouthAnimation();
     }
 }
 
@@ -52,19 +51,19 @@ function forceCompleteText() {
 
 // 口パクアニメーションの開始
 function startMouthAnimation() {
-    if (mouthAnimationInterval) return; // 既に開始されている場合は無視
+    if (mouthAnimationInterval) return;
 
-    const currentImage = character.style.backgroundImage;
-    if (currentImage.includes("_closed")) {
+    if (currentCharacterImage.includes("_closed")) {
         mouthAnimationInterval = setInterval(() => {
             if (mouthOpen) {
-                character.style.backgroundImage = currentImage.replace("_open", "_closed");
+                character.style.backgroundImage = `url(assets/${currentCharacterImage})`;
                 mouthOpen = false;
             } else {
-                character.style.backgroundImage = currentImage.replace("_closed", "_open");
+                const openImage = currentCharacterImage.replace("_closed", "_open");
+                character.style.backgroundImage = `url(assets/${openImage})`;
                 mouthOpen = true;
             }
-        }, 150); // 口パクの速さ
+        }, 150);
     }
 }
 
@@ -72,17 +71,15 @@ function startMouthAnimation() {
 function stopMouthAnimation() {
     clearInterval(mouthAnimationInterval);
     mouthAnimationInterval = null;
-    
-    // 口を閉じた状態に戻す
-    const currentImage = character.style.backgroundImage;
-    if (currentImage.includes("_open")) {
-        character.style.backgroundImage = currentImage.replace("_open", "_closed");
+
+    if (currentCharacterImage.includes("_closed")) {
+        character.style.backgroundImage = `url(assets/${currentCharacterImage})`;
     }
 }
 
 // シナリオの進行
 function loadNextLine() {
-    if (isTyping || isSelecting) return; // 文字送り中や選択肢表示中は無視
+    if (isTyping || isSelecting) return;
 
     if (currentIndex >= scenarioData.length) {
         console.log("シナリオ終了");
@@ -96,17 +93,23 @@ function loadNextLine() {
         const bgFile = line.split(" ")[1];
         background.style.backgroundImage = `url(assets/${bgFile})`;
         currentIndex++;
-        loadNextLine(); // 自動で次の行へ
+        loadNextLine();
         return;
     }
 
     // キャラクター画像の設定
     if (line.startsWith("set char")) {
         const charFile = line.split(" ")[1];
+        currentCharacterImage = charFile;
         character.style.backgroundImage = `url(assets/${charFile})`;
         character.style.display = "block";
+
+        if (isTyping) {
+            startMouthAnimation();
+        }
+
         currentIndex++;
-        loadNextLine(); // 自動で次の行へ
+        loadNextLine();
         return;
     }
 
@@ -114,14 +117,13 @@ function loadNextLine() {
     if (line === "set select") {
         isSelecting = true;
         choiceContainer.innerHTML = "";
-        choiceContainer.style.display = "flex"; // 選択肢を表示
+        choiceContainer.style.display = "flex";
 
-        // 選択肢の追加
         let nextIndex = currentIndex + 1;
         const choices = [];
         let endOfChoices = -1;
+        const skipIndexes = [];
 
-        // 選択肢とその終了位置を特定
         while (nextIndex < scenarioData.length) {
             const optionLine = scenarioData[nextIndex].trim();
 
@@ -136,38 +138,40 @@ function loadNextLine() {
             }
         }
 
-        // 選択肢ボタンの生成
         choices.forEach(choice => {
             const button = document.createElement("button");
             button.textContent = choice.text;
             button.classList.add("choice-button");
 
-            // 選択肢のクリックイベント
             button.onclick = () => {
                 choiceContainer.style.display = "none";
                 isSelecting = false;
 
-                // 対応する選択肢のセリフを表示
                 const targetIndex = scenarioData.findIndex(line => line.startsWith(`select${choice.number} `));
                 if (targetIndex !== -1) {
                     const selectLine = scenarioData[targetIndex];
                     const [, fullText] = selectLine.split(" ");
                     
-                    // キャラ名とセリフを分離
                     if (fullText.includes("「")) {
                         const [selectName, selectText] = fullText.split("「");
                         characterName.textContent = selectName.trim();
                         currentText = selectText.replace("」", "").trim();
                         typeText(currentText);
                     } else {
-                        // キャラ名なしのセリフ（直接表示）
                         characterName.textContent = "";
                         currentText = fullText.trim();
                         typeText(currentText);
                     }
 
-                    // 次の通常セリフに進む位置に設定
-                    skipIndex = targetIndex;
+                    // 選択肢ブロック全体をスキップ
+                    skipIndexes.push(...scenarioData
+                        .map((line, index) => ({ line, index }))
+                        .filter(item => item.line.startsWith("select"))
+                        .map(item => item.index)
+                    );
+
+                    // スキップ範囲を設定
+                    skipIndex = Math.max(...skipIndexes);
                     currentIndex = endOfChoices;
                 }
             };
@@ -175,7 +179,6 @@ function loadNextLine() {
             choiceContainer.appendChild(button);
         });
 
-        // 選択肢ブロックの終了位置に移動
         currentIndex = endOfChoices;
         return;
     }
@@ -187,15 +190,14 @@ function loadNextLine() {
         return;
     }
 
-    // 通常のセリフの表示（選択肢の範囲外のみ）
-    if (currentIndex !== skipIndex) {
+    // 通常のセリフの表示
+    if (currentIndex > skipIndex) {
         const [name, text] = line.split("「");
         if (text) {
             characterName.textContent = name.trim();
             currentText = text.replace("」", "").trim();
             typeText(currentText);
         } else {
-            // キャラ名なしのセリフ
             characterName.textContent = "";
             currentText = line.trim();
             typeText(currentText);
