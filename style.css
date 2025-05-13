@@ -18,7 +18,7 @@
     background-position: center;
     background-repeat: no-repeat;
     z-index: 1;
-    /*will-change: background-image;*/
+    will-change: background-image;
 }
 
 /* キャラクター画像のスタイル */
