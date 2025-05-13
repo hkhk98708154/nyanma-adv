@@ -10,13 +10,12 @@ const scenarioData = [
     "にゃんまちゃん「おひるねとツナマヨおにぎりが大好きで、スーパー銭湯にもよく行くんや〜！みんなとワイワイ盛り上がるのが大好きやねん！」",
     "set char-niko_closed.png",
     "にゃんまちゃん「あと、ほんとうの推しはもちろんにゃんまるコイン($NYAN)やで！」",
+    "set char-def_closed.png",
     "にゃんまちゃん「にゃんまるコインについて、説明聞いてくれるよね？」",
     "set select",
     "1: うん、聞かせて！",
     "2: べつにいいかな...",
-    "select1 set char-niko_closed.png",
     "select1 にゃんまちゃん「よっしゃ！じゃあできるだけ分かりやすく説明していくで！」",
-    "select2 set char-dogeza_closed.png",
     "select2 にゃんまちゃん「そんなあ...でもちょっとだけ聞いてってや！おねがい！」",
 
     // 1. にゃんまるコイン（NYAN）とは
@@ -77,14 +76,12 @@ const scenarioData = [
     "にゃんまちゃん「でも、GFAとかのサポートで新しいユースケースが出てくる可能性もあるし、ワクワクは止まらへんで！」",
 
     // 6. にゃんまるコイン（NYAN）とは まとめ
-    "set char-niko_closed.png",
+    "set char-def_closed.png",
     "にゃんまちゃん「ここまでで一旦説明は終わりや！どう？にゃんまるコインのこと、ちょっとでもわかってくれたかな？」",
     "set select",
     "1: わかった！",
     "2: あんまり...",
-    "select1 set char-niko_closed.png",
     "select1 にゃんまちゃん「よかったで！ほかに気になることがあれば公式のSNSや、にゃんまちゃんのAIもあるからチェックしてみてや！」",
-    "select2 set char-zito_closed.png",
     "select2 にゃんまちゃん「えー、ちゃんと聞いてくれてたん？でももう一度私の話を聞くか、公式のSNSやにゃんまちゃんのAIをチャックしてくれるときっと理解が進むで！」",
     "set char-niko_closed.png",
     "にゃんまちゃん「またいつでもにゃんまちゃんに会いにきてな！バイバイやで〜！"

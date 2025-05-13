@@ -3,11 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>にゃんまちゃん説明ADV</title>
+    <title>にゃんまちゃんのにゃんまるコイン講座</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
+    <!-- タイトル画面 -->
+    <div id="title-screen">
+        <div id="title-background"></div>
+        <img src="assets/title.png" alt="にゃんまちゃんのにゃんまるコイン講座" id="title-image">
+        <button id="start-button" onclick="startGame()">スタート</button>
+        <p id="title-note">音が出ます。ご注意ください。</p>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="game-container" style="display: none;">
         <div id="background"></div>
         <div id="character"></div>
         <div id="text-box">
@@ -15,17 +24,22 @@
             <div id="dialogue"></div>
         </div>
         <div id="choice-container"></div>
-        <!-- BGM ボタン -->
         <button id="bgm-button" onclick="toggleBGM()">🔊</button>
-        <!-- 音量調整スライダー -->
-        <input type="range" id="volume-slider" min="0" max="100" value="50" onchange="adjustVolume(this.value)">
-        <!-- BGM プレイヤー（非表示） -->
         <audio id="bgm" loop>
             <source src="assets/bgm.mp3" type="audio/mpeg">
         </audio>
+        <input type="range" id="volume-slider" min="0" max="100" value="50" onchange="adjustVolume(this.value)">
     </div>
 
-    <!-- 先にシナリオデータを読み込む -->
+    <!-- 終了画面 -->
+    <div id="end-screen" style="display: none;">
+        <h2>にゃんまちゃんのにゃんまるコイン講座</h2>
+        <button onclick="restartGame()">タイトルに戻る</button>
+        <button onclick="window.open('https://x.com/nyanmarucoin', '_blank')">にゃんまるコイン公式Xはこちら</button>
+        <button onclick="window.open('https://www.gfa.co.jp/crypto/column/memecoin/nyanmaru-coin/', '_blank')">にゃんまるコインの買い方はこちら</button>
+        <button onclick="window.open('https://chatgpt.com/g/g-6808ec69b6a88191a2c873f6d5e45227-niyanmatiyanai', '_blank')">にゃんまちゃんAIはこちら</button>
+    </div>
+
     <script src="scenario.js"></script>
     <script src="game.js"></script>
 </body>

@@ -76,12 +76,61 @@ function stopMouthAnimation() {
     }
 }
 
+// ゲーム開始
+function startGame() {
+    const titleScreen = document.getElementById("title-screen");
+    const gameContainer = document.getElementById("game-container");
+    const endScreen = document.getElementById("end-screen");
+    titleScreen.style.display = "none";
+    gameContainer.style.display = "block";
+    endScreen.style.display = "none";
+
+    // BGMの再生
+    const bgm = document.getElementById("bgm");
+    try {
+        bgm.play();
+        document.getElementById("bgm-button").textContent = "🔊";
+    } catch (e) {
+        console.log("自動再生がブロックされました");
+    }
+
+    // シナリオの初期化
+    currentIndex = 0;
+    isTyping = false;
+    isSelecting = false;
+    currentCharacterImage = "";  // キャラ画像の初期化
+
+    // 最初のシナリオを強制的にロード
+    loadNextLine();
+}
+
+// ゲーム終了
+function endGame() {
+    const gameContainer = document.getElementById("game-container");
+    const endScreen = document.getElementById("end-screen");
+    gameContainer.style.display = "none";
+    endScreen.style.display = "flex";
+
+    // BGMを停止
+    const bgm = document.getElementById("bgm");
+    bgm.pause();
+    bgm.currentTime = 0;
+}
+
+// タイトルに戻る
+function restartGame() {
+    const titleScreen = document.getElementById("title-screen");
+    const endScreen = document.getElementById("end-screen");
+    titleScreen.style.display = "flex";
+    endScreen.style.display = "none";
+}
+
 // シナリオの進行
 function loadNextLine() {
     if (isTyping || isSelecting) return;
 
     if (currentIndex >= scenarioData.length) {
-        console.log("シナリオ終了");
+        endGame();
         return;
     }
 
