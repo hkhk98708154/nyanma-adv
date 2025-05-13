@@ -27,8 +27,8 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 270px;
-    height: 405px;
+    width: 540px;
+    height: 810px;
     max-width: 80vw;
     max-height: 80vh;
     background-repeat: no-repeat;
@@ -232,7 +232,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("assets/bg-def.png");
+    background-image: url("assets/bg-def.webp");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

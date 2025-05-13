@@ -17,6 +17,54 @@ let mouthAnimationInterval = null;
 let mouthOpen = false;
 let currentCharacterImage = "";
 
+// 画像プリロード関数
+function preloadImages(images) {
+    return Promise.all(
+        images.map(src => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = src;
+                img.onload = () => resolve(src);
+                img.onerror = reject;
+            });
+        })
+    );
+}
+
+// 使用する画像リストを収集
+function collectAllImagePaths() {
+    const imagePaths = new Set();
+
+    scenarioData.forEach(line => {
+        if (line.startsWith("set bg")) {
+            const bgFile = line.split(" ")[1];
+            imagePaths.add(`assets/${bgFile}`);
+        }
+        if (line.startsWith("set char")) {
+            const charFile = line.split(" ")[1];
+            imagePaths.add(`assets/${charFile}`);
+            // 口パク対応のペア画像も追加
+            if (charFile.includes("_closed")) {
+                imagePaths.add(`assets/${charFile.replace("_closed", "_open")}`);
+            }
+        }
+    });
+
+    return Array.from(imagePaths);
+}
+
+// ゲーム開始前にプリロード
+window.addEventListener("load", async () => {
+    const imagePaths = collectAllImagePaths();
+
+    try {
+        await preloadImages(imagePaths);
+        console.log("全画像のプリロードが完了しました。");
+    } catch (error) {
+        console.error("画像のプリロードに失敗しました:", error);
+    }
+});
+
 // テキストを1文字ずつ表示する関数
 function typeText(text) {
     isTyping = true;
