@@ -12,8 +12,7 @@ let isSelecting = false;
 let isTyping = false;
 let currentText = "";
 let charIndex = 0;
-let typingSpeed = 60;
-let skipIndex = -1;
+let typingSpeed = 120;
 let mouthAnimationInterval = null;
 let mouthOpen = false;
 let currentCharacterImage = "";
@@ -121,9 +120,9 @@ function loadNextLine() {
 
         let nextIndex = currentIndex + 1;
         const choices = [];
-        let endOfChoices = -1;
-        const skipIndexes = [];
+        const choiceStartIndex = currentIndex;
 
+        // 選択肢の取得
         while (nextIndex < scenarioData.length) {
             const optionLine = scenarioData[nextIndex].trim();
 
@@ -133,11 +132,11 @@ function loadNextLine() {
                 choices.push({ number: optionNumber, text: optionText });
                 nextIndex++;
             } else {
-                endOfChoices = nextIndex;
                 break;
             }
         }
 
+        // 選択肢ボタンの生成
         choices.forEach(choice => {
             const button = document.createElement("button");
             button.textContent = choice.text;
@@ -147,61 +146,63 @@ function loadNextLine() {
                 choiceContainer.style.display = "none";
                 isSelecting = false;
 
-                const targetIndex = scenarioData.findIndex(line => line.startsWith(`select${choice.number} `));
-                if (targetIndex !== -1) {
-                    const selectLine = scenarioData[targetIndex];
-                    const [, fullText] = selectLine.split(" ");
-                    
-                    if (fullText.includes("「")) {
-                        const [selectName, selectText] = fullText.split("「");
-                        characterName.textContent = selectName.trim();
-                        currentText = selectText.replace("」", "").trim();
-                        typeText(currentText);
-                    } else {
-                        characterName.textContent = "";
-                        currentText = fullText.trim();
-                        typeText(currentText);
+                // 選択肢に対応するセリフを表示
+                const choicePrefix = `select${choice.number} `;
+                let foundChoice = false;
+
+                for (let i = nextIndex; i < scenarioData.length; i++) {
+                    const choiceLine = scenarioData[i].trim();
+
+                    // キャラ設定
+                    if (choiceLine.startsWith("set char")) {
+                        const [, charFile] = choiceLine.split(" ");
+                        currentCharacterImage = charFile;
+                        character.style.backgroundImage = `url(assets/${charFile})`;
+                        continue;
                     }
 
-                    // 選択肢ブロック全体をスキップ
-                    skipIndexes.push(...scenarioData
-                        .map((line, index) => ({ line, index }))
-                        .filter(item => item.line.startsWith("select"))
-                        .map(item => item.index)
-                    );
+                    // 対応するセリフを表示
+                    if (choiceLine.startsWith(choicePrefix)) {
+                        const [, fullText] = choiceLine.split(" ", 2);
+                        if (fullText.includes("「")) {
+                            const [selectName, selectText] = fullText.split("「");
+                            characterName.textContent = selectName.trim();
+                            typeText(selectText.replace("」", "").trim());
+                        } else {
+                            characterName.textContent = "";
+                            typeText(fullText.trim());
+                        }
 
-                    // スキップ範囲を設定
-                    skipIndex = Math.max(...skipIndexes);
-                    currentIndex = endOfChoices;
+                        // 選択肢後の通常セリフの位置に設定
+                        currentIndex = i + 1;
+                        foundChoice = true;
+                        break;
+                    }
+                }
+
+                // 選択肢ブロックの終了位置に移動
+                if (foundChoice) {
+                    currentIndex++;
+                } else {
+                    currentIndex = nextIndex;
                 }
             };
 
             choiceContainer.appendChild(button);
         });
 
-        currentIndex = endOfChoices;
-        return;
-    }
-
-    // 選択肢セリフはスキップ
-    if (line.startsWith("select")) {
-        currentIndex++;
-        loadNextLine();
+        currentIndex = nextIndex;
         return;
     }
 
     // 通常のセリフの表示
-    if (currentIndex > skipIndex) {
-        const [name, text] = line.split("「");
-        if (text) {
-            characterName.textContent = name.trim();
-            currentText = text.replace("」", "").trim();
-            typeText(currentText);
-        } else {
-            characterName.textContent = "";
-            currentText = line.trim();
-            typeText(currentText);
-        }
+    const [name, text] = line.split("「");
+    if (text) {
+        characterName.textContent = name.trim();
+        typeText(text.replace("」", "").trim());
+    } else {
+        characterName.textContent = "";
+        typeText(line.trim());
     }
 
     currentIndex++;
