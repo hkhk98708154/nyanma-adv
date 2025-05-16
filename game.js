@@ -209,7 +209,7 @@ function loadNextLine() {
         return;
     }
 
-    // 選択肢の設定
+    // **選択肢の設定**
     if (line === "set select") {
         isSelecting = true;
         choiceContainer.innerHTML = "";
@@ -217,23 +217,31 @@ function loadNextLine() {
 
         let nextIndex = currentIndex + 1;
         const choices = [];
-        const choiceStartIndex = currentIndex;
+        const choiceMap = {};
 
-        // 選択肢の取得
+        // **選択肢の取得**
         while (nextIndex < scenarioData.length) {
             const optionLine = scenarioData[nextIndex].trim();
 
-            if (optionLine.startsWith("1:") || optionLine.startsWith("2:")) {
-                const optionText = optionLine.substring(3).trim();
-                const optionNumber = optionLine[0];
-                choices.push({ number: optionNumber, text: optionText });
-                nextIndex++;
-            } else {
-                break;
+            // **選択肢ブロックの終了を検出**
+            if (optionLine.startsWith("set ") || optionLine === "set select") break;
+            
+            // **選択肢オプション**
+            if (optionLine.match(/^\d:/)) {
+                const [optionNumber, optionText] = optionLine.split(": ");
+                choices.push({ number: optionNumber.trim(), text: optionText.trim() });
             }
+
+            // **選択肢のターゲットセリフを取得**
+            if (optionLine.startsWith("select")) {
+                const [selectLabel, fullText] = optionLine.split(" ", 2);
+                choiceMap[selectLabel.trim()] = fullText.trim();
+            }
+
+            nextIndex++;
         }
 
-        // 選択肢ボタンの生成
+        // **選択肢ボタンの生成**
         choices.forEach(choice => {
             const button = document.createElement("button");
             button.textContent = choice.text;
@@ -243,72 +251,53 @@ function loadNextLine() {
                 choiceContainer.style.display = "none";
                 isSelecting = false;
 
-                // 選択肢に対応するセリフを表示
-                const choicePrefix = `select${choice.number} `;
-                let foundChoice = false;
-
-                for (let i = nextIndex; i < scenarioData.length; i++) {
-                    const choiceLine = scenarioData[i].trim();
-
-                    // キャラ設定
-                    if (choiceLine.startsWith("set char")) {
-                        const [, charFile] = choiceLine.split(" ");
-                        currentCharacterImage = charFile;
-                        character.style.backgroundImage = `url(assets/${charFile})`;
-                        continue;
-                    }
-
-                    // 対応するセリフを表示
-                    if (choiceLine.startsWith(choicePrefix)) {
-                        const [, fullText] = choiceLine.split(" ", 2);
-                        if (fullText.includes("「")) {
-                            const [selectName, selectText] = fullText.split("「");
-                            characterName.textContent = selectName.trim();
-                            typeText(selectText.replace("」", "").trim());
-                        } else {
-                            characterName.textContent = "";
-                            typeText(fullText.trim());
-                        }
-
-                        // 選択肢後の通常セリフの位置に設定
-                        currentIndex = i + 1;
-                        foundChoice = true;
-                        break;
+                // **選択肢に対応するセリフを表示**
+                const selectLabel = `select${choice.number}`;
+                const fullText = choiceMap[selectLabel];
+                
+                if (fullText) {
+                    const [selectName, selectText] = fullText.split("「");
+                    if (selectText) {
+                        characterName.textContent = selectName.trim();
+                        typeText(selectText.replace("」", "").trim());
+                    } else {
+                        characterName.textContent = "";
+                        typeText(fullText.trim());
                     }
                 }
 
-                // 選択肢ブロックの終了位置に移動
-                if (foundChoice) {
-                    currentIndex++;
-                } else {
-                    currentIndex = nextIndex;
-                }
+                // **選択肢ブロック終了後に進む**
+                currentIndex = nextIndex;
+                loadNextLine();
             };
 
             choiceContainer.appendChild(button);
         });
 
+        // **現在の選択肢ブロックの終了位置を設定**
         currentIndex = nextIndex;
         return;
     }
 
-    // 通常のセリフの表示
-    const [name, text] = line.split("「");
-    if (text) {
-        characterName.textContent = name.trim();
-        typeText(text.replace("」", "").trim());
-    } else {
-        characterName.textContent = "";
-        typeText(line.trim());
+    // **通常のセリフの表示**
+    if (!line.startsWith("select")) {
+        const [name, text] = line.split("「");
+        if (text) {
+            characterName.textContent = name.trim();
+            typeText(text.replace("」", "").trim());
+        } else {
+            characterName.textContent = "";
+            typeText(line.trim());
+        }
     }
 
     currentIndex++;
 }
 
-// 初期ロード
+// **初期ロード**
 loadNextLine();
 
-// クリックで次のセリフへ
+// **クリックで次のセリフへ**
 textBox.addEventListener("click", () => {
     if (isTyping) {
         forceCompleteText();
@@ -316,6 +305,7 @@ textBox.addEventListener("click", () => {
         loadNextLine();
     }
 });
+
 
 // BGMの制御
 function toggleBGM() {
